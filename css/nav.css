@@ -1,0 +1,51 @@
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #3d2236;
+  color: #fff;
+  padding: 14px 40px;
+}
+.nav-brand h1 { font-family: Georgia, serif; font-weight: 400; font-size: 22px; margin: 0; }
+.nav-brand span { font-size: 12px; opacity: .8; }
+
+.nav-links { display: flex; align-items: center; gap: 24px; }
+.nav-links a {
+  color: #d9c2d4;
+  text-decoration: none;
+  padding: 6px 0;
+  border-bottom: 2px solid transparent;
+}
+.nav-links a:hover { color: #fff; }
+.nav-links a.active { color: #fff; border-bottom-color: #c9a3c0; }
+
+.nav-links a.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, .12);
+  padding: 5px 12px 5px 5px;
+  border-radius: 999px;
+  border-bottom: none;
+  color: #fff;
+  font-size: 13px;
+}
+.nav-links a.nav-user:hover { background: rgba(255, 255, 255, .2); }
+.nav-avatar {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: #8D6B85;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+}
+
+/* hide Home and Scheduler links, keep the name chip */
+.nav-links a:not(.nav-user) {
+    display: none;
+}
+
+@media (max-width: 600px) {
+  .nav-bar { padding: 10px 14px; gap: 8px; }
+  .nav-brand h1 { font-size: 17px; }
+  .nav-brand span { display: none; }
+}

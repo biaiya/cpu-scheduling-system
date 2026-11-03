@@ -1,0 +1,21 @@
+/* shared fonts for every page */
+:root {
+    --font-body: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    --font-heading: Georgia, "Times New Roman", serif;
+}
+
+body {
+    font-family: var(--font-body);
+}
+
+h1,
+h2 {
+    font-family: var(--font-heading);
+    font-weight: 400;
+}
+
+/* buttons and input boxes use the page font too */
+button,
+input {
+    font-family: inherit;
+}

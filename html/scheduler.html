@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scheduler | CPU Scheduling System</title>
+    <link rel="stylesheet" href="../css/nav.css">
+    <link rel="stylesheet" href="../css/scheduler.css">
+    <link rel="stylesheet" href="../css/base.css">
+</head>
+
+<body>
+    <div id="nav"></div>
+
+    <div class="layout">
+
+        <main class="wrap">
+
+            <section class="card">
+                <h2>Algorithm</h2>
+
+                <div class="chips" id="chips">
+                    <button type="button" class="chip on" data-algo="fcfs">FCFS</button>
+                    <button type="button" class="chip" data-algo="sjf">SJF</button>
+                    <button type="button" class="chip" data-algo="priority">Priority</button>
+                    <button type="button" class="chip" data-algo="rr">Round Robin</button>
+                </div>
+
+                <div id="quantumBox" class="hidden">
+                    <label for="quantum">Time quantum</label>
+                    <input type="number" id="quantum" min="1" value="2">
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-head">
+                    <h2>Processes</h2>
+                    <div class="count-box">
+                        <label for="processCount">Number of processes</label>
+                        <input type="number" id="processCount" min="2" max="5" value="3">
+                        <p id="countMsg" class="count-msg"></p>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Process</th>
+                            <th>Arrival</th>
+                            <th>Burst</th>
+                            <th class="col-priority hidden">Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody id="processBody"></tbody>
+                </table>
+
+                <button type="button" id="runBtn" class="run">Run simulation</button>
+                <div class="actions">
+                    <button type="button" id="resetBtn" class="btn-secondary">Reset inputs</button>
+                    <a href="home.html" class="btn-secondary">Exit</a>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Gantt chart</h2>
+                <div id="ganttBody">
+                    <p class="empty">Run the simulation to see the Gantt chart.</p>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2>Results</h2>
+                <div id="resultBody">
+                    <p class="empty">Run the simulation to see the waiting and turnaround times.</p>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="../js/nav.js"></script>
+    <script src="../js/scheduler-ui.js"></script>
+</body>
+
+</html>

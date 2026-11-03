@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign up | CPU Scheduling System</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/transition.css">
+    <link rel="stylesheet" href="../css/base.css">
+</head>
+
+<body>
+    <div class="page">
+
+        <section class="brand-panel">
+            <div>
+                <h1>CPU Scheduling System</h1>
+                <p>College of Engineering and Architecture</p>
+            </div>
+        </section>
+
+        <section class="form-panel">
+            <form class="form-box" id="signupForm">
+                <h2>Create account</h2>
+
+                <label for="full_name">Full name</label>
+                <input type="text" id="full_name" name="full_name" placeholder="Juan Dela Cruz"
+                    autocomplete="name" autofocus required>
+
+                <label for="student_id">Student ID</label>
+                <input type="text" id="student_id" name="student_id" placeholder="2021-00123"
+                    autocomplete="username" required>
+
+                <label for="password">Password</label>
+                <div class="field">
+                    <input type="password" id="password" name="password" placeholder="••••••••"
+                        autocomplete="new-password" minlength="8" required>
+                    <button type="button" class="eye" aria-label="Show password"></button>
+                </div>
+                <p class="hint">At least 8 characters.</p>
+
+                <label for="confirm_password">Confirm password</label>
+                <div class="field">
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••"
+                        autocomplete="new-password" minlength="8" required>
+                    <button type="button" class="eye" aria-label="Show password"></button>
+                </div>
+                <p id="matchMsg" class="hint"></p>
+
+                <p id="message" class="message"></p>
+
+                <button type="submit">Sign up</button>
+
+                <p class="switch">Already have an account? <a href="login.html">Sign in</a></p>
+            </form>
+        </section>
+
+    </div>
+
+    <script src="../js/transition.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/password.js"></script>
+</body>
+
+</html>
