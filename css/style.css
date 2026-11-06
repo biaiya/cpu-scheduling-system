@@ -188,3 +188,69 @@ button:hover {
 .hint.bad {
     color: #a33a3a;
 }
+
+/* gantt bars + CPU chip art */
+.art {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    margin-bottom: 40px;
+    overflow: hidden;
+}
+
+.rows {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.row {
+    flex: 1 1 0;
+    min-height: 18px;
+    display: flex;
+    gap: 4px;
+}
+
+.row i {
+    display: block;
+    flex: 1 1 auto;
+    height: 100%;
+    border-radius: 5px;
+}
+
+.b1 {
+    background: #8D6B85;
+}
+
+.b2 {
+    background: #B08FA8;
+}
+
+.b3 {
+    background: #5A4055;
+}
+
+.b4 {
+    background: #D6BFD0;
+}
+
+/* empty gaps at the start or end of a row (staggers both edges) */
+.sp {
+    background: none;
+    flex: 0 0 auto !important;
+}
+
+/* gold CPU chip: centered, with gold glow + soft drop shadow */
+.chip {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150px;
+    height: 150px;
+    margin: 0;
+    transform: translate(-50%, -50%);
+    filter:
+        drop-shadow(0 0 10px rgba(242, 193, 78, 0.8)) drop-shadow(0 0 22px rgba(242, 193, 78, 0.45)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+}

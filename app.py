@@ -1,7 +1,9 @@
 import os
 import secrets
-import sqlite3
 
+import psycopg2
+import psycopg2.errors
+from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 from flask import Flask, abort, jsonify, redirect, request, send_from_directory, session
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -15,7 +17,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-BASE_FOLDER = os.path.dirname(os.path.abspath(__file__))       
+BASE_FOLDER = os.path.dirname(os.path.abspath(__file__))
 IS_DEV = os.environ.get("APP_ENV") == "development"
 
 # =============== settings ===============
@@ -36,34 +38,42 @@ app.config.update(
     SESSION_COOKIE_SECURE=not IS_DEV,  # HTTPS-only cookie when deployed
 )
 
-# DB_FILE can be changed later (for example, to a persistent disk on a host)
-DB_FILE = os.environ.get("DB_FILE", os.path.join(BASE_FOLDER, "users.db"))
+# Neon Postgres connection string (set in .env locally, and in Render's Environment tab)
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is not set.")
 
 
 # =============== database ===============
 
 def get_db():
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row
-    return conn
+    return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
 
 
 def setup_database():
     """Create the users table the first time the app runs."""
     conn = get_db()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id            INTEGER PRIMARY KEY AUTOINCREMENT,
-            name          TEXT NOT NULL,
-            student_id    TEXT NOT NULL UNIQUE COLLATE NOCASE,
-            password_hash TEXT NOT NULL
-        )
-    """)
-    conn.commit()
-    conn.close()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id            SERIAL PRIMARY KEY,
+                    name          TEXT NOT NULL,
+                    student_id    TEXT NOT NULL,
+                    password_hash TEXT NOT NULL
+                )
+            """)
+            # Student ID is unique regardless of upper/lower case
+            cur.execute("""
+                CREATE UNIQUE INDEX IF NOT EXISTS users_student_id_key
+                ON users (LOWER(student_id))
+            """)
+        conn.commit()
+    finally:
+        conn.close()
 
 
-# Runs when the app loads, so it also works under gunicorn later
+# Runs when the app loads, so it also works under gunicorn
 setup_database()
 
 
@@ -119,14 +129,16 @@ def api_signup():
 
     conn = get_db()
     try:
-        # the password is saved as a hash, never as plain text
-        conn.execute(
-            "INSERT INTO users (name, student_id, password_hash) VALUES (?, ?, ?)",
-            (name, student_id, generate_password_hash(password)),
-        )
+        with conn.cursor() as cur:
+            # the password is saved as a hash, never as plain text
+            cur.execute(
+                "INSERT INTO users (name, student_id, password_hash) VALUES (%s, %s, %s)",
+                (name, student_id, generate_password_hash(password)),
+            )
         conn.commit()
-    except sqlite3.IntegrityError:
-        # student_id is UNIQUE, so a second account with the same ID fails
+    except psycopg2.errors.UniqueViolation:
+        # the unique index on student_id makes a second account with the same ID fail
+        conn.rollback()
         return jsonify(ok=False, message="That Student ID already has an account."), 400
     finally:
         conn.close()
@@ -145,10 +157,17 @@ def api_login():
     if not student_id or not password:
         return jsonify(ok=False, message="Please enter your Student ID and password."), 400
 
-    # look for this Student ID in the database
+    # look for this Student ID in the database (not case sensitive)
     conn = get_db()
-    user = conn.execute("SELECT * FROM users WHERE student_id = ?", (student_id,)).fetchone()
-    conn.close()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT * FROM users WHERE LOWER(student_id) = LOWER(%s)",
+                (student_id,),
+            )
+            user = cur.fetchone()
+    finally:
+        conn.close()
 
     # no such account, or the password does not match the saved hash
     if user is None or not check_password_hash(user["password_hash"], password):
@@ -165,14 +184,18 @@ def logout():
     session.clear()
     return redirect("/html/login.html")
 
+
 @app.route("/api/me")
 def api_me():
     if "student_id" not in session:
         return jsonify(ok=False), 401
     return jsonify(ok=True, name=session["name"])
 
+
+# =============== scheduler ===============
+
 def _gantt_from_rows(rows, ct_index):
-    """Build Gantt blocks from KAKA results. Start = CT - burst (non-preemptive)."""
+    """Build Gantt blocks from the algorithm results. Start = CT - burst (non-preemptive)."""
     blocks = [[x[0], x[ct_index] - x[2], x[ct_index]] for x in rows]
     blocks.sort(key=lambda b: b[1])
     return blocks
@@ -192,7 +215,7 @@ def api_schedule():
     algo = data.get("algo")
     processes = data.get("processes", [])
 
-    # KAKA process layout: [pid, arrival, burst]  (+ priority or remaining)
+    # process layout: [pid, arrival, burst]  (+ priority or remaining)
     if algo == "fcfs":
         rows = [[p["id"], p["arrival"], p["burst"]] for p in processes]
         rows = fcfs(rows)
@@ -223,6 +246,8 @@ def api_schedule():
 
     return jsonify(ok=True, gantt=gantt, completed=completed,
                    avg_turnaround=avg_tat, avg_waiting=avg_wt)
+
+
 # =============== start (local only) ===============
 
 if __name__ == "__main__":

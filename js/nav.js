@@ -21,11 +21,57 @@ document.getElementById("nav").innerHTML = `
   </header>
 `;
 
+/* Logout confirmation dialog */
+document.body.insertAdjacentHTML("beforeend", `
+  <div id="logoutModal" class="logout-modal">
+    <div class="logout-box">
+      <h3>Are you sure you want to logout?</h3>
+      <p>You will be signed out of the system.</p>
+      <div class="logout-actions">
+        <button type="button" id="logoutNo">Cancel</button>
+        <button type="button" id="logoutYes">Yes, logout</button>
+      </div>
+    </div>
+  </div>
+`);
+
+const logoutModal = document.getElementById("logoutModal");
+
+function openLogout() {
+  logoutModal.classList.add("open");
+}
+
+function closeLogout() {
+  logoutModal.classList.remove("open");
+}
+
+// Navbar sign-out link and the Exit button both open the dialog
+document.addEventListener("click", function (e) {
+  if (e.target.closest(".nav-user")) {
+    e.preventDefault();
+    openLogout();
+  }
+});
+
+document.getElementById("logoutNo").addEventListener("click", closeLogout);
+
+document.getElementById("logoutYes").addEventListener("click", function () {
+  window.location.href = "/logout";
+});
+
+logoutModal.addEventListener("click", function (e) {
+  if (e.target === logoutModal) closeLogout();
+});
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") closeLogout();
+});
+
 fetch("/api/me")
-    .then(res => res.json())
-    .then(data => {
-        if (data.ok) {
-            document.getElementById("navName").textContent = data.name;
-            document.getElementById("navAvatar").textContent = data.name.charAt(0).toUpperCase();
-        }
-    });
+  .then(res => res.json())
+  .then(data => {
+    if (data.ok) {
+      document.getElementById("navName").textContent = data.name;
+      document.getElementById("navAvatar").textContent = data.name.charAt(0).toUpperCase();
+    }
+  });

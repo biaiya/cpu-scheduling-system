@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | CPU Scheduling System</title>
+    <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/nav.css">
     <link rel="stylesheet" href="../css/home.css">
-    <link rel="stylesheet" href="../css/base.css">
 </head>
 
 <body>
@@ -20,22 +20,29 @@
         <div class="cards">
             <a class="card" href="scheduler.html?algo=fcfs">
                 <h3>First Come, First Served</h3>
-                <p>Runs processes in the order they arrive. One long job can make short ones wait.</p>
+                <p>The simplest CPU scheduling algorithm. The process that arrives first in the ready queue is the first
+                    to be executed, and it runs until it finishes. A long process at the front makes the shorter ones
+                    behind it wait.</p>
             </a>
 
             <a class="card" href="scheduler.html?algo=sjf">
                 <h3>Shortest Job First</h3>
-                <p>The arrived process with the smallest burst time runs next. Non-preemptive.</p>
+                <p>A scheduling algorithm that picks the waiting process with the smallest burst time to run next. It
+                    gives a low average waiting time, but processes with long burst times may wait for a long time.</p>
             </a>
 
             <a class="card" href="scheduler.html?algo=priority">
                 <h3>Priority</h3>
-                <p>Smaller number means higher priority. Non-preemptive.</p>
+                <p>Each process is given a priority number, and the CPU goes to the process with the highest priority.
+                    In this system, a smaller number means a higher priority. Low priority processes may wait for a long
+                    time.</p>
             </a>
 
             <a class="card" href="scheduler.html?algo=rr">
                 <h3>Round Robin</h3>
-                <p>Each process runs one time quantum, then goes to the back of the queue.</p>
+                <p>Each process is given a fixed amount of CPU time called a time quantum. When the quantum ends, the
+                    process goes to the back of the ready queue and the next process runs, until all processes are
+                    finished.</p>
             </a>
         </div>
     </main>

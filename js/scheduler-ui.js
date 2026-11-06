@@ -22,13 +22,12 @@ function setAlgo(value) {
     });
 
     // time quantum is only for Round Robin
-       quantumBox.classList.toggle("hidden", value !== "rr");
+    quantumBox.classList.toggle("hidden", value !== "rr");
 
     // priority column is only for Priority
     document.querySelectorAll(".col-priority").forEach((cell) => {
         cell.classList.toggle("hidden", value !== "priority");
     });
-
 }
 
 chips.addEventListener("click", (e) => {
@@ -37,13 +36,13 @@ chips.addEventListener("click", (e) => {
 });
 
 /* ---------- process table ---------- */
-function addRow(arrival = 0, burst = 0) {
+function addRow() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
         <td class="pid"></td>
-        <td><input type="number" class="arrival" min="0" value="${arrival}"></td>
-        <td><input type="number" class="burst" min="1" value="${burst}"></td>
-        <td class="col-priority"><input type="number" class="priority" min="1" value="0"></td>
+        <td><input type="number" class="arrival" min="0" placeholder="0"></td>
+        <td><input type="number" class="burst" min="1" placeholder="0"></td>
+        <td class="col-priority"><input type="number" class="priority" min="1" placeholder="0"></td>
     `;
     tbody.appendChild(tr);
     renumber();
@@ -103,9 +102,24 @@ function getProcesses() {
 const colors = ["#5d3c55", "#8d6b85", "#74506c", "#a07a97", "#43273d"];
 
 function validate(processes, quantum) {
-    // 1. every burst time must be filled in
+    // 0. no box may be left empty (empty boxes only show the placeholder)
+    const rowEls = Array.from(tbody.children);
+    for (let i = 0; i < rowEls.length; i++) {
+        const id = "P" + (i + 1);
+        if (rowEls[i].querySelector(".arrival").value.trim() === "") {
+            return id + ": please fill in the arrival time.";
+        }
+        if (rowEls[i].querySelector(".burst").value.trim() === "") {
+            return id + ": please fill in the burst time.";
+        }
+        if (algo === "priority" && rowEls[i].querySelector(".priority").value.trim() === "") {
+            return id + ": please fill in the priority.";
+        }
+    }
+
+    // 1. every burst time must be at least 1
     if (processes.some((p) => p.burst < 1)) {
-        return "Please fill in the table first. Every burst time must be at least 1.";
+        return "Every burst time must be at least 1.";
     }
 
     // 2. check each row
@@ -184,9 +198,11 @@ function renderResults(processes, result) {
         <div class="gantt">${blocks}</div>
         <div class="ticks">${ticks}</div>
     `;
+
     // the steps shown under the averages
     const waitingSteps = rows.map((r) => r.waiting).join(" + ");
     const turnaroundSteps = rows.map((r) => r.turnaround).join(" + ");
+
     // Results card
     resultBody.innerHTML = `
         <table class="result-table">
@@ -204,7 +220,7 @@ function renderResults(processes, result) {
         </table>
 
         <div class="summary">
-                        <div class="metric">
+            <div class="metric">
                 <span>Avg waiting</span>
                 <b>${avgWaiting.toFixed(2)}</b>
                 <small>(${waitingSteps}) / ${rows.length} = ${avgWaiting.toFixed(2)}</small>
@@ -250,19 +266,26 @@ document.getElementById("runBtn").addEventListener("click", run);
 
 function resetInputs() {
     Array.from(tbody.children).forEach((tr) => {
-        tr.querySelector(".arrival").value = 0;
-        tr.querySelector(".burst").value = 0;
-        tr.querySelector(".priority").value = 0;
+        tr.querySelector(".arrival").value = "";
+        tr.querySelector(".burst").value = "";
+        tr.querySelector(".priority").value = "";
     });
     document.getElementById("quantum").value = 2;
     ganttBody.innerHTML = `<p class="empty">Run the simulation to see the Gantt chart.</p>`;
     resultBody.innerHTML = `<p class="empty">Run the simulation to see the waiting and turnaround times.</p>`;
 }
 
-document.getElementById("resetBtn").addEventListener("click", resetInputs);
+document.getElementById("resetBtn").addEventListener("click", () => {
+    askConfirm("Reset input", "Are you sure you want to reset all input?", resetInputs);
+});
+
+document.getElementById("exitBtn").addEventListener("click", () => {
+    askConfirm("Exit", "Are you sure you want to exit?", () => {
+        window.location.href = "home.html";
+    });
+});
 
 /* ---------- start ---------- */
-addRow();
 addRow();
 addRow();
 // open with the algorithm picked on the home page (scheduler.html?algo=rr)
