@@ -95,8 +95,9 @@
                 <h2>Sign in now!</h2>
 
                 <label for="student_id">Student ID</label>
-                <input type="text" id="student_id" name="student_id" placeholder="2021-00123" autocomplete="username"
-                    autofocus required>
+                <input type="text" id="student_id" name="student_id" placeholder="1234567890" autocomplete="username"
+                    inputmode="numeric" maxlength="10" autofocus required>
+                <p id="studentIdMsg" class="hint"></p>
 
                 <label for="password">Password</label>
                 <div class="field">

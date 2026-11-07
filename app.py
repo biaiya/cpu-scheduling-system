@@ -1,4 +1,5 @@
 import os
+import re
 import secrets
 
 import psycopg2
@@ -77,6 +78,13 @@ def setup_database():
 setup_database()
 
 
+# =============== student id check ===============
+
+def valid_student_id(student_id):
+    """Student ID must be exactly 10 digits (0-9 only)."""
+    return re.fullmatch(r"[0-9]{10}", student_id) is not None
+
+
 # =============== pages (your html, css, and js folders) ===============
 
 @app.route("/")
@@ -118,6 +126,8 @@ def api_signup():
 
     if not name or not student_id or not password or not confirm:
         return jsonify(ok=False, message="Please fill in all fields."), 400
+    if not valid_student_id(student_id):
+        return jsonify(ok=False, message="Student ID must be exactly 10 digits (numbers only)."), 400
     if len(name) > 100 or len(student_id) > 50:
         return jsonify(ok=False, message="Name or Student ID is too long."), 400
     if len(password) < 8:
@@ -156,6 +166,8 @@ def api_login():
 
     if not student_id or not password:
         return jsonify(ok=False, message="Please enter your Student ID and password."), 400
+    if not valid_student_id(student_id):
+        return jsonify(ok=False, message="Student ID must be exactly 10 digits (numbers only)."), 400
 
     # look for this Student ID in the database (not case sensitive)
     conn = get_db()

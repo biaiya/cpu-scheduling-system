@@ -220,15 +220,15 @@ function renderResults(processes, result) {
         </table>
 
         <div class="summary">
-            <div class="metric">
+                       <div class="metric">
                 <span>Avg waiting</span>
-                <b>${avgWaiting.toFixed(2)}</b>
-                <small>(${waitingSteps}) / ${rows.length} = ${avgWaiting.toFixed(2)}</small>
+                <b>${avgWaiting.toFixed(2)} ms</b>
+                <small>(${waitingSteps}) / ${rows.length} = ${avgWaiting.toFixed(2)} ms</small>
             </div>
             <div class="metric">
                 <span>Avg turnaround</span>
-                <b>${avgTurnaround.toFixed(2)}</b>
-                <small>(${turnaroundSteps}) / ${rows.length} = ${avgTurnaround.toFixed(2)}</small>
+                <b>${avgTurnaround.toFixed(2)} ms</b>
+                <small>(${turnaroundSteps}) / ${rows.length} = ${avgTurnaround.toFixed(2)} ms</small>
             </div>
             <div class="metric"><span>Finish time</span><b>${total}</b></div>
         </div>
