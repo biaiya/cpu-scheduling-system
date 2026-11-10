@@ -416,3 +416,8 @@
         .ticks {
             min-width: 520px;
         }
+
+        .arrival.locked {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }

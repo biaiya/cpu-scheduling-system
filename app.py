@@ -85,6 +85,11 @@ def api_schedule():
     else:
         return jsonify(ok=False, message="Unknown scheduling algorithm."), 400
 
+    # show the arrival times exactly as the user typed them
+    for p in processes:
+        if p["id"] in completed:
+            completed[p["id"]][0] = p["arrival"]
+
     n = len(completed)
     avg_tat = sum(v[3] for v in completed.values()) / n
     avg_wt = sum(v[4] for v in completed.values()) / n
