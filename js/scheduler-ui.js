@@ -32,9 +32,17 @@ function setAlgo(value) {
 
 chips.addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");
-    if (chip) setAlgo(chip.dataset.algo);
-});
+    if (!chip || chip.dataset.algo === algo) return;
 
+    setAlgo(chip.dataset.algo);
+
+    // update the address bar so a refresh keeps the same algorithm
+    history.replaceState(null, "", "?algo=" + chip.dataset.algo);
+
+    // clear the old results so they don't look like they belong to the new algorithm
+    ganttBody.innerHTML = `<p class="empty">Run the simulation to see the Gantt chart.</p>`;
+    resultBody.innerHTML = `<p class="empty">Run the simulation to see the waiting and turnaround times.</p>`;
+});
 /* ---------- process table ---------- */
 function addRow() {
     const tr = document.createElement("tr");
@@ -132,16 +140,19 @@ function validate(processes, quantum) {
         }
     }
 
-    // 3. arrival times must be 0 to n-1, each used once (so there is no Idle)
-    const used = [];
-    for (const p of processes) {
-        if (p.arrival > processes.length - 1) {
-            return p.id + ": arrival time must be from 0 to " + (processes.length - 1) + ".";
+    // 3. FCFS and Round Robin: arrival times must be 0 to n-1, each used once (so there is no Idle)
+    //    SJF and Priority: any arrival time is allowed, and processes may share the same arrival time
+    if (algo === "fcfs" || algo === "rr") {
+        const used = [];
+        for (const p of processes) {
+            if (p.arrival > processes.length - 1) {
+                return p.id + ": arrival time must be from 0 to " + (processes.length - 1) + ".";
+            }
+            if (used.includes(p.arrival)) {
+                return p.id + ": that arrival time is already used by another process.";
+            }
+            used.push(p.arrival);
         }
-        if (used.includes(p.arrival)) {
-            return p.id + ": that arrival time is already used by another process.";
-        }
-        used.push(p.arrival);
     }
 
     // 4. Round Robin needs a time quantum
@@ -247,12 +258,18 @@ async function run() {
     }
 
     // send the table to Python (app.py) and wait for the answer
-    const response = await fetch("/api/schedule", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ algo: algo, quantum: quantum, processes: processes }),
-    });
-    const result = await response.json();
+    let result;
+    try {
+        const response = await fetch("/api/schedule", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ algo: algo, quantum: quantum, processes: processes }),
+        });
+        result = await response.json();
+    } catch (err) {
+        ganttBody.innerHTML = `<p class="error">Could not get a result from the server. Check the terminal for the Python error.</p>`;
+        return;
+    }
 
     if (!result.ok) {
         ganttBody.innerHTML = `<p class="error">${result.message}</p>`;

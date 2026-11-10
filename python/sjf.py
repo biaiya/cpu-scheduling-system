@@ -1,17 +1,19 @@
-def sjf(p, n):
+def sjf(processes):
+    # each row: [pid, arrival, burst]
+    p = [list(x) for x in processes]      # don't mutate the input
+
+    # shortest burst first; arrival time is ignored when choosing
+    # (ties: the smaller pid goes first)
+    p.sort(key=lambda x: (x[2], x[0]))
+
     time = 0
-    done = []
-
-    while len(done) < n:
-        ready = [x for x in p if x[1] <= time and x[0] not in done]
-
-        if not ready:
-            time = min(x[1] for x in p if x[0] not in done)
-            continue
-
-        x = min(ready, key=lambda x: x[2])
+    for x in p:
+        x[1] = 0                 # arrival is treated as 0, so nothing waits for a late arrival
         time += x[2]
-        x.extend([time, time-x[1], time-x[1]-x[2]])
-        done.append(x[0])
+        ct = time
+        tat = ct - x[1]
+        wt = tat - x[2]
+        x.extend([ct, tat, wt])
 
-    return p
+    order = [x[0] for x in p]
+    return p, order

@@ -1,0 +1,73 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    color: #fff;
+    background: linear-gradient(135deg, #4a3547, #8D6B85);
+    font-family: inherit;
+    /* change to the same font used in style.css */
+}
+
+.welcome {
+    max-width: 560px;
+}
+
+.welcome-tag {
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 16px;
+}
+
+.welcome h1 {
+    font-size: 44px;
+    margin-bottom: 16px;
+}
+
+.welcome-text {
+    font-size: 17px;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin-bottom: 28px;
+}
+
+.welcome-algos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 36px;
+}
+
+.welcome-algos span {
+    padding: 6px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 999px;
+    font-size: 14px;
+}
+
+.welcome-btn {
+    display: inline-block;
+    padding: 14px 36px;
+    background: #fff;
+    color: #4a3547;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.welcome-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
