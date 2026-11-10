@@ -2,9 +2,9 @@ def sjf(processes):
     # each row: [pid, arrival, burst]
     p = [list(x) for x in processes]      # don't mutate the input
 
-    # shortest burst first; arrival time is ignored when choosing
-    # (ties: the smaller pid goes first)
-    p.sort(key=lambda x: (x[2], x[0]))
+        # the process with arrival 0 (P1) always goes first,
+    # then the rest go shortest burst first (ties: smaller pid)
+    p.sort(key=lambda x: (x[1] != 0, x[2], x[0]))
 
     time = 0
     for x in p:

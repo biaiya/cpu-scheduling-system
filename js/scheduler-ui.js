@@ -62,15 +62,6 @@ function renumber() {
     Array.from(tbody.children).forEach((tr, i) => {
         tr.querySelector(".pid").textContent = "P" + (i + 1);
     });
-
-    // P1 always arrives at 0 and cannot be edited
-    const first = tbody.firstElementChild;
-    if (first) {
-        const arrival = first.querySelector(".arrival");
-        arrival.value = 0;
-        arrival.readOnly = true;
-        arrival.classList.add("locked");
-    }
 }
 
 // make the table have exactly n rows (existing rows keep their values)
@@ -150,12 +141,26 @@ function validate(processes, quantum) {
     }
 
     // 3. P1 is the only process that arrives at 0 (all algorithms)
-    if (processes[0].arrival !== 0) {
-        return "P1: arrival time must be 0.";
+    // 3. exactly one process must arrive at 0 (it always goes first)
+    const zeroCount = processes.filter((p) => p.arrival === 0).length;
+    if (zeroCount === 0) {
+        return "One process must have arrival time 0.";
     }
-    for (const p of processes.slice(1)) {
-        if (p.arrival < 1) {
-            return p.id + ": only P1 can have arrival time 0.";
+    if (zeroCount > 1) {
+        return "Only one process can have arrival time 0.";
+    }
+
+    // FCFS and Round Robin also need arrival times 0 to n-1, each used once (so there is no Idle)
+    if (algo === "fcfs" || algo === "rr") {
+        const used = [];
+        for (const p of processes) {
+            if (p.arrival > processes.length - 1) {
+                return p.id + ": arrival time must be from 0 to " + (processes.length - 1) + ".";
+            }
+            if (used.includes(p.arrival)) {
+                return p.id + ": that arrival time is already used by another process.";
+            }
+            used.push(p.arrival);
         }
     }
 

@@ -1,9 +1,9 @@
 def priority(p, n, gantt):
     # each row: [pid, arrival, burst, priority, remaining, ct, tat, wt]
 
-    # lowest priority number goes first; arrival time is ignored when choosing
-    # (ties: the smaller pid goes first)
-    p.sort(key=lambda x: (x[3], x[0]))
+       # the process with arrival 0 (P1) always goes first,
+    # then the rest go by lowest priority number (ties: smaller pid)
+    p.sort(key=lambda x: (x[1] != 0, x[3], x[0]))
 
     time = 0
     for x in p:
